@@ -88,7 +88,10 @@ const Page = ({ data, maximum, loss = false }) => {
       )}
       {data.map(transaction =>
         loss ? (
-          <View style={styles.row} key={transaction.join("")}>
+          <View
+            style={styles.row}
+            key={`${transaction.join("")}${Math.random()}`}
+          >
             <View
               style={[
                 styles.lossBar,
@@ -107,7 +110,10 @@ const Page = ({ data, maximum, loss = false }) => {
             </View>
           </View>
         ) : (
-          <View style={[styles.row, styles.gain]} key={transaction.join("")}>
+          <View
+            style={[styles.row, styles.gain]}
+            key={`${transaction.join("")}${Math.random()}`}
+          >
             <View
               style={[
                 styles.gainBar,

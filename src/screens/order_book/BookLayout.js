@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const BookLayout = ({ data }) => {
+const BookLayout = ({ data, maximum, size }) => {
   const [expanded, setExpanded] = React.useState(false);
   const [decimals, setDecimals] = React.useState(0);
 
@@ -29,6 +29,7 @@ const BookLayout = ({ data }) => {
   };
 
   const { book } = lang;
+  const { gain, loss } = data;
 
   return (
     <View style={styles.container}>
@@ -40,10 +41,10 @@ const BookLayout = ({ data }) => {
         decimals={decimals}
         onChangeDecimals={changeDecimals}
       />
-      <Drawer expanded={expanded}>
+      <Drawer expanded={expanded} size={size}>
         <View style={styles.pageContainer}>
-          <Page data={data.gain} maximum={data.maximum} />
-          <Page data={data.loss} maximum={data.maximum} loss={true} />
+          <Page data={gain} maximum={maximum} />
+          <Page data={loss} maximum={maximum} loss={true} />
         </View>
       </Drawer>
     </View>

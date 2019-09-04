@@ -1,8 +1,30 @@
 import constants from "./tradingConstants";
 
-export function getData() {
+export function setData(data) {
   return {
-    type: constants.GET_DATA
+    type: constants.SET_DATA,
+    payload: data
+  };
+}
+
+export function setBook(data) {
+  return {
+    type: constants.SET_BOOK,
+    payload: data
+  };
+}
+
+export function setTicker(data) {
+  return {
+    type: constants.SET_TICKER,
+    payload: data
+  };
+}
+
+export function setTrades(data) {
+  return {
+    type: constants.SET_TRADES,
+    payload: data
   };
 }
 

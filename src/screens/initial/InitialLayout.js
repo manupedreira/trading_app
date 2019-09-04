@@ -33,22 +33,18 @@ const styles = StyleSheet.create({
   }
 });
 
-const InitialLayout = ({ data }) => {
-  const { book, ticker, trades } = data;
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <Image
-        source={require("trading_app/src/res/assets/logo.png")}
-        style={styles.logo}
-      />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollview}>
-        <View style={styles.widgetContainer}>
-          <BookScreen data={book} />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
+const InitialLayout = () => (
+  <SafeAreaView style={styles.container}>
+    <Image
+      source={require("trading_app/src/res/assets/logo.png")}
+      style={styles.logo}
+    />
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollview}>
+      <View style={styles.widgetContainer}>
+        <BookScreen />
+      </View>
+    </ScrollView>
+  </SafeAreaView>
+);
 
 export default InitialLayout;

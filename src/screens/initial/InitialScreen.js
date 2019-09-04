@@ -2,7 +2,8 @@ import React from "react";
 import { StatusBar, Platform } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getData } from "trading_app/src/core/trading/tradingActions";
+import websocket from "trading_app/src/services/api";
+import { setData } from "trading_app/src/core/trading/tradingActions";
 import Colors from "trading_app/src/res/styles/colors";
 
 import InitialLayout from "./InitialLayout";
@@ -13,13 +14,17 @@ const InitialScreen = () => {
   }
 
   const dispatch = useDispatch();
-  const data = useSelector(state => state.trading);
+
+  const ws = websocket;
+  ws.setData = newData => {
+    dispatch(setData(newData));
+  };
 
   React.useEffect(() => {
-    dispatch(getData());
-  }, [dispatch]);
+    return () => !!ws && ws.close();
+  }, []);
 
-  return <InitialLayout data={data} />;
+  return <InitialLayout />;
 };
 
 export default InitialScreen;

@@ -2,7 +2,10 @@ import constants from "./tradingConstants";
 
 const initialState = {
   trading: {
-    book: [],
+    book: {
+      loss: [],
+      gain: []
+    },
     ticker: [],
     trades: []
   }
@@ -14,7 +17,10 @@ function tradingReducer(state = initialState, action) {
       return {
         trading: {
           ...state.trading,
-          book: action.payload
+          book: {
+            ...state.trading.book,
+            ...action.payload
+          }
         }
       };
     case constants.SAVE_TICKER:
@@ -31,7 +37,10 @@ function tradingReducer(state = initialState, action) {
           trades: action.payload
         }
       };
-    case constants.GET_DATA:
+    case constants.SET_DATA:
+    case constants.SET_BOOK:
+    case constants.SET_TICKER:
+    case constants.SET_TRADES:
     default:
       return state;
   }

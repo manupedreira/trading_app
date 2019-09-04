@@ -1,26 +1,101 @@
-import { call, delay, put, takeLatest } from "redux-saga/effects";
-
-import * as api from "trading_app/src/services/api";
+import { put, select, takeEvery, takeLatest } from "redux-saga/effects";
 
 import constants from "./tradingConstants";
 import * as actions from "./tradingActions";
 
-function* getData() {
-  const book = yield call(api.getBook);
-  console.log("------------------------Book:", JSON.stringify(book));
-  yield put(actions.saveBook(book));
-  const ticker = yield call(api.getTicker);
-  console.log("------------------------Ticker:", JSON.stringify(ticker));
-  yield put(actions.saveTicker(ticker));
-  const trades = yield call(api.getTrades);
-  console.log("------------------------Trades:", JSON.stringify(trades));
-  yield put(actions.saveTrades(trades));
-  yield delay(1000);
-  yield put(actions.getData());
+function* setData({ payload }) {
+  switch (payload.channel) {
+    case "book":
+      yield put(actions.setBook(payload.data));
+      break;
+    case "ticker":
+      yield put(actions.setTicker(payload.data));
+      break;
+    case "trades":
+      yield put(actions.setTrades(payload.data));
+      break;
+    default:
+      return;
+  }
+}
+
+function* setBook({ payload }) {
+  const { loss, gain } = yield select(state => state.trading.book);
+  let newLoss = null;
+  let newGain = null;
+
+  switch (typeof payload[0]) {
+    case "number":
+      payload[2] >= 0
+        ? (newGain = [payload, ...gain])
+        : (newLoss = [payload, ...loss]);
+      break;
+    case "object":
+      newGain = [...gain];
+      newLoss = [...loss];
+      yield payload.reverse().forEach(transaction => {
+        transaction[2] >= 0
+          ? (newGain = [transaction, ...newGain])
+          : (newLoss = [transaction, ...newLoss]);
+      });
+      break;
+    default:
+      return;
+  }
+
+  const newBook = {};
+
+  if (!!newLoss) {
+    newBook.loss = newLoss.length > 24 ? newLoss.slice(0, 24) : newLoss;
+  }
+
+  if (!!newGain) {
+    newBook.gain = newGain.length > 24 ? newGain.slice(0, 24) : newGain;
+  }
+
+  yield put(actions.saveBook(newBook));
+}
+
+function* setTicker({ payload }) {
+  yield put(actions.saveTicker(payload));
+}
+
+function* setTrades({ payload }) {
+  const trades = yield select(state => state.trading.trades);
+  let newTrades = [];
+
+  switch (typeof payload[0]) {
+    case "number":
+      newTrades = [payload, ...trades];
+      break;
+    case "object":
+      newTrades = [...payload, ...trades];
+      break;
+    default:
+      return;
+  }
+
+  yield put(
+    actions.saveTrades(
+      newTrades.length > 24 ? newTrades.slice(0, 24) : newTrades
+    )
+  );
 }
 
 function* watchGetPetition() {
-  yield takeLatest(constants.GET_DATA, getData);
+  yield takeEvery(constants.SET_DATA, setData);
 }
 
-export default [watchGetPetition];
+function* watchSetBook() {
+  yield takeLatest(constants.SET_BOOK, setBook);
+}
+
+function* watchSetTicker() {
+  yield takeLatest(constants.SET_TICKER, setTicker);
+}
+
+function* watchSetTrades() {
+  yield takeLatest(constants.SET_TRADES, setTrades);
+}
+
+export default [watchGetPetition, watchSetBook, watchSetTicker, watchSetTrades];
